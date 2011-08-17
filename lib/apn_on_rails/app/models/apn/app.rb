@@ -48,6 +48,7 @@ class APN::App < APN::Base
             conn.write(noty.message_for_sending)
           rescue => e
             Rails.logger.error "Cannot send notification ##{noty.id}: " + e.message
+            return if e.message == "Broken pipe"
           end
           noty.sent_at = Time.now
           noty.save
