@@ -31,6 +31,7 @@ module ApnOnRails
           'alter_apn_notifications.rb' => 'db/migrate/alter_apn_notifications.rb',
           'make_device_token_index_nonunique.rb' => 'db/migrate/make_device_token_index_nonunique.rb',
           'add_launch_notification_to_apn_pull_notifications.rb' => 'db/migrate/add_launch_notification_to_apn_pull_notifications.rb',
+          'add_action_key_to_apn_notifications.rb' => 'db/migrate/add_action_key_to_apn_notifications.rb',
         }
 
         templates.each_pair do |name, path|

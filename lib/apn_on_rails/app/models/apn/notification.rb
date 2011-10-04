@@ -51,7 +51,9 @@ class APN::Notification < APN::Base
   def apple_hash
     result = {}
     result['aps'] = {}
-    result['aps']['alert'] = self.alert if self.alert
+    result['aps']['alert'] = {}
+    result['aps']['alert']['body'] = self.alert if self.alert
+    result['aps']['alert']['action-loc-key'] = self.action_key if self.action_key
     result['aps']['badge'] = self.badge.to_i if self.badge
     if self.sound
       result['aps']['sound'] = self.sound if self.sound.is_a? String
@@ -72,8 +74,9 @@ class APN::Notification < APN::Base
   #   apn.badge = 5
   #   apn.sound = 'my_sound.aiff'
   #   apn.alert = 'Hello!'
-  #   apn.to_apple_json # => '{"aps":{"badge":5,"sound":"my_sound.aiff","alert":"Hello!"}}'
+  #   apn.to_apple_json # => '{"aps":{"badge":5,"sound":"my_sound.aiff","alert":{"body":"Hello!", "action-loc-key": "Yes"}}}'
   def to_apple_json
+    logger.debug self.apple_hash.to_json
     self.apple_hash.to_json
   end
   
