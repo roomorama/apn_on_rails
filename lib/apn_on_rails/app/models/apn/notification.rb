@@ -53,7 +53,6 @@ class APN::Notification < APN::Base
     result['aps'] = {}
     result['aps']['alert'] = {}
     result['aps']['alert']['body'] = self.alert if self.alert
-    result['aps']['alert']['action-loc-key'] = self.action_key if self.action_key
     result['aps']['badge'] = self.badge.to_i if self.badge
     if self.sound
       result['aps']['sound'] = self.sound if self.sound.is_a? String
