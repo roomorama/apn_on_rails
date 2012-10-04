@@ -40,7 +40,9 @@ class APN::App < APN::Base
   def self.send_notifications_for_cert(the_cert, app_id)
     begin
       APN::Connection.open_for_delivery({:cert => the_cert}) do |conn, sock|
-        unset = APN::Notification.where(:sent_at => nil).order(:device_id, :created_at)
+        unset = APN::Notification.joins(:device).
+            where(:sent_at => nil, :apn_devices => { :app_id => app_id }).
+            order(:device_id, :created_at).readonly(false)
         unset.each do |noty|
           Rails.logger.debug "Sending notification ##{noty.id}"
           begin
