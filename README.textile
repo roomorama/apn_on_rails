@@ -101,14 +101,6 @@ Or, if you like to live on the edge:
   config.gem 'PRX-apn_on_rails', :lib => 'apn_on_rails', :source => 'http://gems.github.com'
 </pre></code>
 
-h3. Rails3 Bundler setup:
-
-If you are using rails3 you just need to add the following line to your Gemfile
-
-<pre><code>
-  gem 'apn_on_rails', :git => 'https://github.com/timsu/apn_on_rails.git'
-</code></pre>
-
 h2. Setup and Configuration:
 
 Once you have the gem installed via your favorite gem installation, you need to require it so you can
@@ -131,24 +123,33 @@ Rake tasks that ship with APN on Rails:
   end
 </pre></code>
 
+You now need to run the APN generator to create the migration files.
+
+<pre><code>
+ruby script/rails generate apn_on_rails:install
+</pre></code>
+
 Now, to create the tables you need for APN on Rails, run the following task:
 
 <pre><code>
-  $ ruby script/generate apn_migrations
+  $  rake db:migrate
 </pre></code>
 
-If you are using rails3, run the following task:
+APN on Rails uses the Configatron gem, http://github.com/markbates/configatron/tree/master, 
+to configure itself. With the change to multi-app support, the certifications are stored in the 
+database rather than in the config directory.
+
+However, it is still possible to use the default "app" and the certificates
+stored in the config directory.  For this setup, the following configurations apply.)
+APN on Rails has the following default configurations that you change for your setup.  
+
+To generate the files that will be used here, run 
 
 <pre><code>
-  $ rails generate apn_on_rails:migrations
-</code></pre>
+script/rails generate configatron:install
+</pre></code>
 
-APN on Rails uses the Configatron gem, http://github.com/markbates/configatron/tree/master, 
-to configure itself. (With the change to multi-app support, the certifications are stored in the 
-database rather than in the config directory, however, it is still possible to use the default "app" and the certificates
-stored in the config directory.  For this setup, the following configurations apply.)
-APN on Rails has the following default configurations that you change as you
-see fit:
+Then customize the config/configatron files that were generated to your settings.
 
 <pre><code>
   # development (delivery):
@@ -179,14 +180,8 @@ h3. Upgrade Notes:
 If you are upgrading to a new version of APN on Rails you should always run:
 
 <pre><code>
-  $ ruby script/generate apn_migrations
+ruby script/rails generate apn_on_rails:install
 </pre></code>
-
-or the following one if you are using rails3:
-
-<pre><code>
-  $ rails generate apn_on_rails:migrations
-</code></pre>
 
 That way you ensure you have the latest version of the database tables needed.
 (There is an unaddressed problem in which migration 002 was modified in the repo to add the column custom_properties.
@@ -197,7 +192,7 @@ h2. Example (assuming you have created an app and stored your keys on it):
 
 <pre><code>
   $ ./script/console
-  >> app = APN::App.create(:name => "My App", :apn_dev_cert => "PASTE YOUR DEV CERT HERE", :apn_prod_cert => "PASTE YOUR PROD CERT HERE")
+  >> app = APN::App.create(:apn_dev_cert => "PASTE YOUR DEV CERT HERE", :apn_prod_cert => "PASTE YOUR PROD CERT HERE")
   >> device = APN::Device.create(:token => "XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX",:app_id => app.id)
   >> notification = APN::Notification.new
   >> notification.device = device

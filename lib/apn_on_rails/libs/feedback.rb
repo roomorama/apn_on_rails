@@ -25,7 +25,7 @@ module APN
           end
         end
         devices.each(&block) if block_given?
-        return devices
+        devices
       end # devices
       
       def process_devices

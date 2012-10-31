@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.join(File.dirname(__FILE__), '..', '..', '..', '..', 'spec_helper.rb')
 
 describe APN::App do
@@ -208,21 +210,21 @@ describe APN::App do
     
   end
   
-  describe 'cert for production environment' do 
+  describe 'cert for production and staging environments' do 
     
     it 'should return the production cert for the app' do 
+      Rails = double("rails", :env => "production")
       app = AppFactory.create
-      RAILS_ENV = 'production'
       app.cert.should == app.apn_prod_cert
     end
     
   end
   
-  describe 'cert for development and staging environment' do 
+  describe 'cert for development environment' do 
     
     it 'should return the development cert for the app' do 
+      Rails = double("rails", :env => "development")
       app = AppFactory.create
-      RAILS_ENV = 'staging'
       app.cert.should == app.apn_dev_cert
     end
   end

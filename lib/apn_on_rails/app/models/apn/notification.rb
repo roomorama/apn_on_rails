@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 # Represents the message you wish to send. 
 # An APN::Notification belongs to an APN::Device.
 # 
@@ -51,8 +53,7 @@ class APN::Notification < APN::Base
   def apple_hash
     result = {}
     result['aps'] = {}
-    result['aps']['alert'] = {}
-    result['aps']['alert']['body'] = self.alert if self.alert
+    result['aps']['alert'] = self.alert if self.alert
     result['aps']['badge'] = self.badge.to_i if self.badge
     if self.sound
       result['aps']['sound'] = self.sound if self.sound.is_a? String
@@ -73,16 +74,16 @@ class APN::Notification < APN::Base
   #   apn.badge = 5
   #   apn.sound = 'my_sound.aiff'
   #   apn.alert = 'Hello!'
-  #   apn.to_apple_json # => '{"aps":{"badge":5,"sound":"my_sound.aiff","alert":{"body":"Hello!", "action-loc-key": "Yes"}}}'
+  #   apn.to_apple_json # => '{"aps":{"badge":5,"sound":"my_sound.aiff","alert":"Hello!"}}'
   def to_apple_json
-    logger.debug self.apple_hash.to_json
     self.apple_hash.to_json
   end
   
   # Creates the binary message needed to send to Apple.
   def message_for_sending
     json = self.to_apple_json
-    message = "\0\0 #{self.device.to_hexa}\0#{json.length.chr.force_encoding 'ascii-8bit'}#{json}"
+    message = "\0\0 #{self.device.to_hexa}\0#{json.length.chr}#{json}"
+    raise APN::Errors::ExceededMessageSizeError.new(message) if message.size.to_i > 256
     message
   end
   
