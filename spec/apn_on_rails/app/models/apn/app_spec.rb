@@ -22,10 +22,18 @@ describe APN::App do
       APN::App.should_receive(:all).once.and_return([app])                 
       app.should_receive(:cert).twice.and_return(app.apn_dev_cert)
       
-      APN::Device.should_receive(:find_each).twice.and_yield(device)
+      #APN::Device.should_receive(:find_each).twice.and_yield(device)
       
-      device.should_receive(:unsent_notifications).and_return(notifications,[])
+      #device.should_receive(:unsent_notifications).and_return(notifications,[])
       
+      #APN::Notification.should_receive(:find_each).and_yield(notifications)
+      
+      
+      notifications_double = double('notifications')
+      empty_double = double('empty')
+      APN::Notification.stub_chain(:where, :where, :joins).and_return(notifications_double, empty_double)
+      notifications_double.stub(:find_each).and_yield(notifications.first).and_yield(notifications.last)
+      empty_double.stub(:find_each).and_return(nil)
       
       ssl_mock = mock('ssl_mock')
       ssl_mock.should_receive(:write).with('message-0')

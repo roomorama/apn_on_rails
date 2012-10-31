@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 
 # Represents the message you wish to send. 
 # An APN::Notification belongs to an APN::Device.

@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 class APN::App < APN::Base
 
   has_many :groups, :class_name => 'APN::Group', :dependent => :destroy
@@ -45,18 +45,17 @@ class APN::App < APN::Base
       else
         conditions = ["app_id = ?", app_id]
       end
-      begin
-        APN::Connection.open_for_delivery({:cert => the_cert}) do |conn, sock|
-          APN::Device.find_each(:conditions => conditions) do |dev|
-            dev.unsent_notifications.each do |noty|
-              conn.write(noty.message_for_sending)
-              noty.sent_at = Time.now
-              noty.save
-            end
+      notifications = APN::Notification.where(conditions).where(:sent_at => nil).joins(:device)
+      notifications.find_each(:batch_size => 100) do |noty|
+        begin
+          APN::Connection.open_for_delivery({:cert => the_cert}) do |conn, sock|
+            conn.write(noty.message_for_sending)
+            noty.sent_at = Time.now
+            noty.save
           end
+        rescue Exception => e
+          log_connection_exception(e)
         end
-      rescue Exception => e
-        log_connection_exception(e)
       end
     # end
   end
