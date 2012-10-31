@@ -4,7 +4,7 @@ module DeviceFactory
     
     def new(options = {})
       app = APN::App.first
-      options = {:token => DeviceFactory.random_token, :app_id => app.id}.merge(options)
+      options = {:token => DeviceFactory.random_token, :app_id => app.try(:id)}.merge(options)
       return APN::Device.new(options)
     end
     

@@ -31,7 +31,7 @@ describe APN::App do
       
       notifications_double = double('notifications')
       empty_double = double('empty')
-      APN::Notification.stub_chain(:where, :where, :joins).and_return(notifications_double, empty_double)
+      APN::Notification.stub_chain(:where, :joins).and_return(notifications_double, empty_double)
       notifications_double.stub(:find_each).and_yield(notifications.first).and_yield(notifications.last)
       empty_double.stub(:find_each).and_return(nil)
       
@@ -62,13 +62,16 @@ describe APN::App do
          notify.should_receive(:save)
        end  
    
-       APN::Device.should_receive(:find_each).and_yield(device)
-       device.should_receive(:unsent_notifications).and_return(notifications)
+       notifications_double = double('notifications')
+       empty_double = double('empty')
+       APN::Notification.stub_chain(:where, :joins).and_return(notifications_double, empty_double)
+       notifications_double.stub(:find_each).and_yield(notifications.first).and_yield(notifications.last)
+       empty_double.stub(:find_each).and_return(nil)
   
        ssl_mock = mock('ssl_mock')
        ssl_mock.should_receive(:write).with('message-0')
        ssl_mock.should_receive(:write).with('message-1')
-       APN::Connection.should_receive(:open_for_delivery).and_yield(ssl_mock, nil)
+       APN::Connection.should_receive(:open_for_delivery).any_number_of_times.and_yield(ssl_mock, nil)
        APN::App.send_notifications
     end
   end               

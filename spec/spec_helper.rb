@@ -42,6 +42,26 @@ RSpec.configure do |config|
     
   end
   
+  if defined?(ActiveRecord::Base)
+    begin
+      require 'database_cleaner'
+      config.before(:suite) do
+        DatabaseCleaner.strategy = :truncation
+        DatabaseCleaner.clean_with(:truncation)
+      end
+
+      config.before(:each) do
+        DatabaseCleaner.start
+      end
+
+      config.after(:each) do
+        DatabaseCleaner.clean
+      end
+
+    rescue LoadError => ignore_if_database_cleaner_not_present
+    end
+  end
+  
 end
 
 def fixture_path(*name)
