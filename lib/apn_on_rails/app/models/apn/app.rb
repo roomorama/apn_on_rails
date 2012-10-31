@@ -40,7 +40,7 @@ class APN::App < APN::Base
 
   def self.send_notifications_for_cert(the_cert, app_id)
     # unless self.unsent_notifications.nil? || self.unsent_notifications.empty?
-      notifications = APN::Notification.where(:sent_at => nil, :devices => {:app_id => app_id}).joins(:device)
+      notifications = APN::Notification.where(:sent_at => nil, :apn_devices => {:app_id => app_id}).joins(:device)
       notifications.find_each(:batch_size => 100) do |noty|
         begin  
           APN::Connection.open_for_delivery({:cert => the_cert}) do |conn, sock|
