@@ -9,7 +9,9 @@ class APN::App < APN::Base
   has_many :unsent_group_notifications, :through => :groups
 
   def cert
-    (defined?(::Rails) && (::Rails.env == "production" || ::Rails.env == "staging") ? apn_prod_cert : apn_dev_cert)
+    #(defined?(::Rails) && (::Rails.env == "production" || ::Rails.env == "staging") ? apn_prod_cert : apn_dev_cert)
+    # Always use the production certificate because testflight is weird
+    apn_prod_cert
   end
 
   # Opens a connection to the Apple APN server and attempts to batch deliver
@@ -45,10 +47,11 @@ class APN::App < APN::Base
         begin  
           APN::Connection.open_for_delivery({:cert => the_cert}) do |conn, sock|
             begin
-              
-              conn.write(noty.message_for_sending)
-              noty.sent_at = Time.now
-              noty.save
+              result = conn.write(noty.enhanced_message_for_sending)
+              unless result.nil?
+                noty.sent_at = Time.now
+                noty.save
+              end
             rescue Exception => e
               if e.message == "Broken pipe"
                 #Write failed (disconnected). Read response.
